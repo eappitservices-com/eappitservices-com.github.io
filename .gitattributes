@@ -1,0 +1,14 @@
+# Normalise line endings. CNAME in particular must be LF-only — a trailing CR
+# breaks GitHub Pages' custom-domain detection.
+* text=auto eol=lf
+
+CNAME text eol=lf
+.nojekyll -text
+
+# Binary assets — never touch these.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
