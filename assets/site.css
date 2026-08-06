@@ -1,0 +1,431 @@
+/* ============================================================================
+   eApp IT Services — presentation layer
+   Loaded after the compiled Tailwind block, so equal-specificity rules here win.
+   ========================================================================== */
+
+:root {
+  /* ink */
+  --ink:          #0f1c2e;   /* headings */
+  --body:         #4a5a6e;   /* body copy — softened from near-black */
+  --muted:        #6b7c91;
+
+  /* brand */
+  --deep:         #041426;
+  --deep-2:       #0b3555;
+  --brand:        #0a7ea4;
+  --brand-bright: #22d3ee;
+
+  /* surfaces — off-white to take the glare off large light areas */
+  --page:         #fbfcfe;
+  --surface:      #ffffff;
+  --tint:         #f4f8fc;
+  --tint-blue:    #eef5ff;
+  --hairline:     #e6edf5;
+
+  /* curvature */
+  --r-sm:   14px;
+  --r:      20px;
+  --r-lg:   28px;
+  --r-xl:   36px;
+  --r-pill: 999px;
+
+  /* elevation — ambient + key light, kept mild */
+  --sh-1: 0 1px 2px rgba(16, 32, 52, .04), 0 6px 16px -8px rgba(16, 32, 52, .12);
+  --sh-2: 0 1px 2px rgba(16, 32, 52, .05), 0 14px 34px -14px rgba(16, 32, 52, .20);
+  --sh-3: 0 2px 4px rgba(16, 32, 52, .06), 0 26px 56px -20px rgba(16, 32, 52, .28);
+
+  /* 3D button stack: inset top highlight, contact shadow, cast shadow */
+  --sh-btn:       inset 0 1px 0 rgba(255, 255, 255, .30),
+                  inset 0 -1px 0 rgba(0, 0, 0, .10),
+                  0 2px 3px rgba(4, 20, 38, .16),
+                  0 6px 14px -5px rgba(4, 20, 38, .30);
+  --sh-btn-hover: inset 0 1px 0 rgba(255, 255, 255, .38),
+                  inset 0 -1px 0 rgba(0, 0, 0, .10),
+                  0 4px 6px rgba(4, 20, 38, .18),
+                  0 14px 26px -8px rgba(4, 20, 38, .34);
+  --sh-btn-active: inset 0 2px 4px rgba(4, 20, 38, .26),
+                   0 1px 2px rgba(4, 20, 38, .18);
+
+  /* motion */
+  --ease:  cubic-bezier(.22, .61, .36, 1);
+  --glide: cubic-bezier(.16, 1, .3, 1);
+}
+
+/* --- base ------------------------------------------------------------------ */
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--page);
+  color: var(--body);
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.7;                      /* generous leading, easier to scan */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* fixed nav would otherwise cover the target of every in-page anchor */
+[id] { scroll-margin-top: 6rem; }
+
+::selection { background: rgba(34, 211, 238, .28); }
+
+/* --- typography ------------------------------------------------------------ */
+
+h1, h2, h3 {
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+h1 { font-size: clamp(2.15rem, 1.35rem + 3.4vw, 4rem); font-weight: 700; letter-spacing: -0.032em; }
+h2 { font-size: clamp(1.7rem, 1.25rem + 1.8vw, 2.6rem);  font-weight: 700; }
+h3 { font-size: clamp(1.08rem, 1rem + 0.32vw, 1.28rem);  font-weight: 700; line-height: 1.3; }
+
+p  { text-wrap: pretty; }
+
+/* the small uppercase eyebrow labels */
+.canva-text.uppercase {
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .18em;
+}
+
+/* addresses carry meaningful line breaks in the source text */
+.preserve-lines { white-space: pre-line; }
+
+/* Retune the palette the compiled Tailwind classes hard-code. Same specificity,
+   loaded later, so these win — softer ink, less contrast fatigue. */
+body.bg-white  { background: var(--page); }
+.text-gray-900 { color: var(--ink); }
+.text-gray-700 { color: var(--body); }
+.text-gray-600 { color: var(--body); }
+.text-cyan-600 { color: var(--brand); }
+
+/* --- navigation ------------------------------------------------------------ */
+
+/* .fixed is carried along only to outrank the bg-[#031124]/95 utility */
+nav.fixed {
+  background: rgba(4, 20, 38, .72);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid rgba(34, 211, 238, .14);
+  transition: background .45s var(--ease), border-color .45s var(--ease),
+              box-shadow .45s var(--ease);
+}
+
+nav.fixed.is-scrolled {
+  background: rgba(4, 20, 38, .93);
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, .85);
+}
+
+nav a {
+  position: relative;
+  padding: .3rem 0;
+  transition: color .3s var(--ease);
+}
+
+/* underline that glides out from the centre */
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--brand-bright), #7dd3fc);
+  transform: translateX(-50%);
+  transition: width .38s var(--glide);
+}
+
+nav a:hover::after { width: 100%; }
+
+/* --- logo ------------------------------------------------------------------
+   Transparent PNG; the soft glow lets it sit on the navy bar instead of
+   floating on a hard white rectangle. */
+
+nav img.canva-image {
+  height: 2.9rem;
+  width: auto;
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, .30))
+          drop-shadow(0 3px 6px rgba(0, 0, 0, .40));
+  transition: transform .5s var(--glide), filter .5s var(--ease);
+}
+
+nav img.canva-image:hover {
+  transform: translateY(-1px) scale(1.03);
+  filter: drop-shadow(0 0 16px rgba(34, 211, 238, .48))
+          drop-shadow(0 5px 10px rgba(0, 0, 0, .45));
+}
+
+/* --- hero ------------------------------------------------------------------ */
+
+header {
+  border-bottom-left-radius: var(--r-xl);
+  border-bottom-right-radius: var(--r-xl);
+  overflow: hidden;
+}
+
+header .absolute.inset-0 { border-radius: inherit; }
+
+.hero-overlay {
+  /* stays dark behind the headline on the left, opens up on the right so the
+     data-centre photograph still reads */
+  background: linear-gradient(135deg,
+              rgba(4, 20, 38, .94) 0%,
+              rgba(6, 42, 82, .80) 50%,
+              rgba(8, 63, 104, .58) 100%);
+}
+
+header h1 { color: #fff; }
+
+/* slow drift on the hero photograph */
+header img.canva-image {
+  transform: scale(1.06);
+  animation: drift 26s var(--ease) infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: scale(1.06) translate3d(0, 0, 0); }
+  to   { transform: scale(1.13) translate3d(-1.5%, -1.2%, 0); }
+}
+
+/* --- buttons — 3D elevated ------------------------------------------------- */
+
+.canva-button {
+  position: relative;
+  border-radius: var(--r-pill);
+  padding: .95rem 1.9rem;
+  font-weight: 700;
+  font-size: .95rem;
+  letter-spacing: .01em;
+  cursor: pointer;
+  will-change: transform;
+  transition: transform .32s var(--glide), box-shadow .32s var(--ease),
+              filter .32s var(--ease);
+}
+
+.btn-primary {
+  color: #fff;
+  border: none;
+  background: linear-gradient(180deg, #17a2c9 0%, var(--brand) 52%, #086783 100%);
+  box-shadow: var(--sh-btn);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh-btn-hover);
+  filter: saturate(112%) brightness(1.04);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: var(--sh-btn-active);
+}
+
+.btn-ghost {
+  color: #b9f0fb;
+  border: 1px solid rgba(34, 211, 238, .55);
+  background: linear-gradient(180deg, rgba(34, 211, 238, .16), rgba(34, 211, 238, .06));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18),
+              0 2px 3px rgba(4, 20, 38, .22),
+              0 8px 18px -8px rgba(4, 20, 38, .45);
+}
+
+.btn-ghost:hover {
+  transform: translateY(-3px);
+  color: #fff;
+  border-color: rgba(34, 211, 238, .85);
+  background: linear-gradient(180deg, rgba(34, 211, 238, .28), rgba(34, 211, 238, .12));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26),
+              0 4px 6px rgba(4, 20, 38, .26),
+              0 16px 28px -10px rgba(4, 20, 38, .55);
+}
+
+.btn-ghost:active {
+  transform: translateY(1px);
+  box-shadow: var(--sh-btn-active);
+}
+
+.canva-button:focus-visible {
+  outline: 3px solid rgba(34, 211, 238, .65);
+  outline-offset: 3px;
+}
+
+/* --- cards ----------------------------------------------------------------- */
+
+.canva-card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
+  overflow: hidden;
+  will-change: transform;
+  transition: transform .5s var(--glide), box-shadow .5s var(--ease),
+              border-color .5s var(--ease);
+}
+
+.canva-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--sh-3);
+  border-color: rgba(34, 211, 238, .38);
+}
+
+/* image inside a card: rounds with the card, eases on hover */
+.canva-card img.canva-image {
+  border-radius: 0;
+  transition: transform .8s var(--glide);
+}
+
+.canva-card:hover img.canva-image { transform: scale(1.06); }
+
+.canva-card h3 { margin-bottom: .4rem; }
+
+.canva-card p { color: var(--body); }
+
+/* --- sections -------------------------------------------------------------- */
+
+#specializations { background: var(--tint); }
+#mobile          { background: var(--tint-blue); }
+
+.canva-section {
+  border-radius: var(--r-xl);
+  margin: 0 auto;
+  max-width: 96rem;
+  overflow: hidden;
+}
+
+#specializations .canva-card,
+#mobile          .canva-card { border-radius: var(--r-lg); }
+
+/* the phone photo in the mobile section */
+#mobile img.canva-image {
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-3);
+  transition: transform .6s var(--glide), box-shadow .6s var(--ease);
+}
+
+#mobile img.canva-image:hover {
+  transform: translateY(-6px) rotate(-1deg);
+  box-shadow: 0 34px 64px -22px rgba(16, 32, 52, .42);
+}
+
+#mobile li {
+  transition: transform .35s var(--glide);
+}
+
+#mobile li:hover { transform: translateX(4px); }
+
+/* --- contact --------------------------------------------------------------- */
+
+#contact {
+  background: linear-gradient(135deg, var(--deep) 0%, var(--deep-2) 62%, #0d5b7e 100%);
+  color: #cfeefb;
+}
+
+#contact h2, #contact h3 { color: #fff; }
+
+#contact .canva-text.uppercase { color: var(--brand-bright); }
+
+#contact .canva-card {
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(34, 211, 238, .22);
+  border-radius: var(--r);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10),
+              0 18px 40px -22px rgba(0, 0, 0, .8);
+}
+
+#contact .canva-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, .11);
+  border-color: rgba(34, 211, 238, .48);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14),
+              0 28px 56px -24px rgba(0, 0, 0, .9);
+}
+
+#contact .canva-card p { color: rgba(207, 238, 251, .82); }
+
+#contact a {
+  color: #9fe6f7;
+  text-decoration-color: rgba(159, 230, 247, .35);
+  text-underline-offset: 3px;
+  transition: color .3s var(--ease), text-decoration-color .3s var(--ease);
+}
+
+#contact a:hover {
+  color: #fff;
+  text-decoration-color: rgba(255, 255, 255, .9);
+}
+
+/* --- footer ---------------------------------------------------------------- */
+
+/* The contact panel above is a rounded inset block on the light page, so the
+   footer stays light rather than butting a second dark slab against it. */
+.site-footer {
+  background: transparent;
+  padding: 2.5rem 0 3.25rem;
+}
+
+.site-footer > div {
+  border-top: 1px solid var(--hairline);
+  padding-top: 1.9rem;
+}
+
+.footer-logo {
+  height: 2rem;
+  width: auto;
+  opacity: .9;
+  transition: opacity .4s var(--ease);
+}
+
+.footer-logo:hover { opacity: 1; }
+
+.footer-note {
+  color: var(--muted);
+  font-size: .82rem;
+  letter-spacing: .01em;
+}
+
+/* --- scroll reveal --------------------------------------------------------- */
+
+/* Scoped under .js-reveal, which the behaviour script sets on <html> before
+   paint. Without JS the content simply renders — it is never hidden. */
+.js-reveal .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .85s var(--glide), transform .85s var(--glide);
+}
+
+.js-reveal .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- accessibility --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+
+  .js-reveal .reveal { opacity: 1; transform: none; }
+  header img.canva-image { animation: none; transform: scale(1.06); }
+}
+
+/* --- small screens --------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  :root { --r-xl: 26px; --r-lg: 22px; }
+
+  .canva-section { border-radius: var(--r-lg); }
+  .canva-button  { width: 100%; justify-content: center; }
+  nav img.canva-image { height: 2.4rem; }
+}
